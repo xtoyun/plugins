@@ -8,7 +8,7 @@
 */
 namespace xto\plugins;
 
-use xto\App;
+//use xto\App;
 
 abstract class PluginContainer{
     private static $_instance;
@@ -17,7 +17,7 @@ abstract class PluginContainer{
     static function instance(){
         if (is_null ( self::$_instance ) || isset ( self::$_instance )) {
             self::$_instance = new static(); 
-            self::$_instance->app=App::instance(); 
+            //self::$_instance->app=App::instance(); 
             //self::$_instance->build();
         }
         return self::$_instance;
@@ -36,6 +36,7 @@ abstract class PluginContainer{
      * @return string
      */
 	private function getPluginLocalPath(){
+        
         return $this->root.$this->PluginVirtualPath;
     }
 
@@ -45,6 +46,7 @@ abstract class PluginContainer{
      * @return array
      */
 	private function getPlugins(){
+      
         return $this->read_dir_queue($this->PluginLocalPath);
     }
 
@@ -79,7 +81,7 @@ abstract class PluginContainer{
      * @return string
      */
     public function getRoot(){
-        return str_replace('\\','/',realpath(dirname(__FILE__).'/../../'));
+        return str_replace('\\','/',realpath(dirname(__FILE__).'/../../../../'));
     }
 
     /**
@@ -88,18 +90,23 @@ abstract class PluginContainer{
      * @return array
      */
     protected function read_dir_queue($dir){  
-        $dir=str_replace('/xto/plugins', '/plugins', $dir);
+        //$dir=str_replace('/xto/plugins', '/plugins', $dir);
+        
         $files=array();  
         $queue=array($dir);
         while($data=each($queue)){  
             $path=$data['value'];  
             if(is_dir($path) && $handle=opendir($path)){  
                 while($file=readdir($handle)){  
+                     
                     if($file=='.'||$file=='..') continue; 
                     $real_path=$file;
                     $name=str_replace('.php','',$file);
+
                     $url=str_replace('/','\\',$this->PluginVirtualPath.'/'.$name);
+           
                     $r = new \ReflectionClass($url);
+           
                     if($r->implementsInterface('\xto\plugins\IPlugin')){
                         $m=new $url;
                         $files[$name] =  array(
